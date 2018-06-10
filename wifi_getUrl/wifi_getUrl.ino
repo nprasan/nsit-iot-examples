@@ -1,9 +1,9 @@
 #include <WiFi.h>
 
 const char* ssid     = "VentureSky";
-const char* password = "1234567890";
+const char* password = "qwertyuiop";
 
-const char* host = "venturesky.in";
+const char* host = "www.nsit.ac.in";
 
 void setup()
 {
@@ -34,7 +34,7 @@ void setup()
         return;
     }
 
-    String url = "/test.html";
+    String url = "/";
 
     Serial.print("Requesting URL: ");
     Serial.println(url);
@@ -54,7 +54,10 @@ void setup()
 
     while(client.available()) {
         String line = client.readStringUntil('\r');
-        Serial.print(line);
+        int n = line.indexOf("fa-calendar");
+        if(n > 0)
+          Serial.print(line.substring(n+17, n+27));
+        //Serial.print(line);
     }
 
     Serial.println();
