@@ -1,12 +1,12 @@
+#define ledPin  26
+
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(26, OUTPUT);
+  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  digitalWrite(26, LOW);
+  digitalWrite(ledPin, LOW);
   delay(1000);
-  digitalWrite(26, HIGH);
+  digitalWrite(ledPin, HIGH);
   delay(1000);
 }
