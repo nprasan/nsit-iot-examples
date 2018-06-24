@@ -1,9 +1,12 @@
 #include <WiFi.h>
-
-const char* ssid     = "VentureSky";
-const char* password = "asdfghjkl";
+#include <DNSServer.h>
 
 WiFiServer server(80);
+
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
+
+IPAddress apIP(192, 168, 1, 1);
 
 #define LEDC_CHANNEL        0
 #define LEDC_TIMER_RES      10
@@ -13,40 +16,35 @@ WiFiServer server(80);
 int max_brightness = 1023;
 int brightness = 0;
 
+const char* ssid     = "Portal-ESP";
+//const char* password = "1234567890";
+
 void setup()
 {
     Serial.begin(115200);
     ledcSetup(LEDC_CHANNEL, LEDC_PWM_FREQ, LEDC_TIMER_RES);
     ledcAttachPin(LED_PIN, LEDC_CHANNEL);
 
-    Serial.println();
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+    WiFi.softAP(ssid);
 
-    WiFi.begin(ssid, password);
+    dnsServer.start(DNS_PORT, "*", apIP);
 
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-
-    Serial.println("");
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-    
     server.begin();
-
 }
 
 void loop()
 {
+  dnsServer.processNextRequest();
+
   WiFiClient client = server.available();   // listen for incoming clients
 
   if (client) 
   {                             
     Serial.println("New Client.");
-    String currentLine = "";             
+    String currentLine = "";
+    long timestamp = millis();            
     while (client.connected()) 
     {            
       if (client.available()) 
@@ -97,6 +95,8 @@ void loop()
             Serial.print(b);
          }
       }
+      if(millis() - timestamp > 2000)
+        break;
     }
 
     client.stop();

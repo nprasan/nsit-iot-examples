@@ -15,31 +15,31 @@ const char* password = "1234567890";
 
 void setup()
 {
-    Serial.begin(115200);
-    ledcSetup(LEDC_CHANNEL, LEDC_PWM_FREQ, LEDC_TIMER_RES);
-    ledcAttachPin(LED_PIN, LEDC_CHANNEL);
+  Serial.begin(115200);
+  ledcSetup(LEDC_CHANNEL, LEDC_PWM_FREQ, LEDC_TIMER_RES);
+  ledcAttachPin(LED_PIN, LEDC_CHANNEL);
 
-    WiFi.mode(WIFI_AP);
-    WiFi.softAP(ssid, password);
-    server.begin();
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP();
+  server.begin();
 }
 
 void loop()
 {
   WiFiClient client = server.available();   // listen for incoming clients
 
-  if (client) 
-  {                             
+  if (client)
+  {
     Serial.println("New Client.");
-    String currentLine = "";             
-    while (client.connected()) 
-    {            
-      if (client.available()) 
-      {             
-        char c = client.read();             
-        Serial.write(c);                    
-        if (c == '\n') 
-        {                   
+    String currentLine = "";
+    while (client.connected())
+    {
+      if (client.available())
+      {
+        char c = client.read();
+        Serial.write(c);
+        if (c == '\n')
+        {
           if (currentLine.length() == 0)        // End of Request
           {
             //Response Header
@@ -49,38 +49,38 @@ void loop()
 
             //Response Body
             client.print("<form action=\"/\" method=\"get\">");
-            client.print("<input name=\"led\" type=\"text\">");   
-            client.print("<input type=\"submit\" value=\"Set\">");   
+            client.print("<input name=\"led\" type=\"text\">");
+            client.print("<input type=\"submit\" value=\"Set\">");
             client.print("</form>");
-            
+
             // End of Response
             client.println();
             break;
-          } 
-          else 
+          }
+          else
           {
             currentLine = "";
           }
-        } 
-        else if (c != '\r') 
-            currentLine += c;      
-        
-        if (currentLine.endsWith("GET /?led=")) 
+        }
+        else if (c != '\r')
+          currentLine += c;
+
+        if (currentLine.endsWith("GET /?led="))
         {
-            String brightness = "";
-            char b = client.read();
-            while(b >= '0' && b <= '9')
-            {
-               brightness +=b;
-               b = client.read();
-            }
-            if(brightness != "")
-            {
-              ledcWrite(LEDC_CHANNEL, map(brightness.toInt(), 0, 100, 0, 1023));
-              Serial.print(brightness);
-            }
-            Serial.print(b);
-         }
+          String brightness = "";
+          char b = client.read();
+          while (b >= '0' && b <= '9')
+          {
+            brightness += b;
+            b = client.read();
+          }
+          if (brightness != "")
+          {
+            ledcWrite(LEDC_CHANNEL, map(brightness.toInt(), 0, 100, 0, 1023));
+            Serial.print(brightness);
+          }
+          Serial.print(b);
+        }
       }
     }
 

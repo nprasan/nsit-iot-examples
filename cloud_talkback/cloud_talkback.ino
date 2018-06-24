@@ -2,8 +2,8 @@
 
 #define LED_PIN   26
 
-const char* ssid     = "VentureSky";
-const char* password = "asdfghjkl";
+const char* ssid     = "VSLocal";
+const char* password = "1234567890";
 
 const char* host = "api.thingspeak.com";
 WiFiClient client;

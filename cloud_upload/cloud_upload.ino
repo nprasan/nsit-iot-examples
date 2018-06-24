@@ -33,8 +33,8 @@ void setup()
 
 void loop()
 {
-    String url = "/update?api_key=YCF6BKG0ZGKZC4JM&field1=";
-    url = url + analogRead(34);
+    String url = "/update?api_key=YQPHP8IIVJ5RGHHP&field1=";
+    url = url + random(0,10);
 
     Serial.print("Requesting URL: ");
     Serial.println(url);
