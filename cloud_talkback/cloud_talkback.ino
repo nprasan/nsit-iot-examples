@@ -1,5 +1,7 @@
 #include <WiFi.h>
 
+#define LED_PIN   26
+
 const char* ssid     = "VentureSky";
 const char* password = "asdfghjkl";
 
@@ -9,6 +11,8 @@ const int httpPort = 80;
 
 void setup()
 {
+    pinMode(LED_PIN, OUTPUT);
+    
     Serial.begin(115200);
     Serial.println();
     Serial.print("Connecting to ");
@@ -33,12 +37,7 @@ void setup()
 
 void loop()
 {
-    String url = "/update?api_key=YCF6BKG0ZGKZC4JM&field1=";
-    url = url + analogRead(34);
-
-    Serial.print("Requesting URL: ");
-    Serial.println(url);
-
+    String url = "/talkbacks/26912/commands/execute.json?api_key=O45N7IR7RSS2D5JW";
     if (!client.connect(host, httpPort)) {
         Serial.println("connection failed");
         return;
@@ -58,21 +57,33 @@ void loop()
     }
 
     bool headerComplete = false;
+    int count;
     while(client.available()) {
         String line = client.readStringUntil('\r');
         if(headerComplete)
         {
-          int dataCount = line.toInt();
-          if(dataCount)
-            Serial.println("Data Uploaded");
-          else
-            Serial.println("Upload Failed");
+            if(++count == 2)
+            {
+              int n1 = line.indexOf("command_string");
+              int n2 = line.indexOf(",", n1+17);
+              String cmd =  line.substring(n1+17, n2-1);
+              if(cmd != "")
+                Serial.println(cmd);
+              if(cmd == "ON")
+                digitalWrite(LED_PIN, HIGH);
+              if(cmd == "OFF")
+                digitalWrite(LED_PIN, LOW);
+                
+            }
+            
         }
         if(line == "\n")
+        {
           headerComplete = true;
+          count = 0;
+        }
 
     }
-
-    delay(20000);
+   delay(1000);
 }
 
